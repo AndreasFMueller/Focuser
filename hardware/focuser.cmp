@@ -1,0 +1,171 @@
+Cmp-Mod V01 Created by CvPcb (2013-jul-07)-stable date = Sat 16 Jan 2016 09:42:08 PM CET
+
+BeginCmp
+TimeStamp = /569A6185;
+Reference = C1;
+ValeurCmp = 0.1u;
+IdModule  = SM0603_Capa;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A627E;
+Reference = C2;
+ValeurCmp = 0.33u;
+IdModule  = c_tant_A;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A72AB;
+Reference = C3;
+ValeurCmp = 1u;
+IdModule  = SM0603_Capa;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A7341;
+Reference = C4;
+ValeurCmp = 22p;
+IdModule  = SM0603_Capa;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A7350;
+Reference = C5;
+ValeurCmp = 22p;
+IdModule  = SM0603_Capa;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A73FE;
+Reference = C6;
+ValeurCmp = 0.1u;
+IdModule  = SM0603_Capa;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A87E3;
+Reference = D1;
+ValeurCmp = LED;
+IdModule  = LED-3MM;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A8A7A;
+Reference = D2;
+ValeurCmp = LED;
+IdModule  = LED-3MM;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A60B0;
+Reference = IC1;
+ValeurCmp = AT90USB162-A;
+IdModule  = TQFP32;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A61B7;
+Reference = J1;
+ValeurCmp = USB;
+IdModule  = USB_B;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A5770;
+Reference = P1;
+ValeurCmp = Power;
+IdModule  = PIN_ARRAY_2X1;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A5EE7;
+Reference = P2;
+ValeurCmp = Motor;
+IdModule  = PIN_ARRAY_4x1;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A705D;
+Reference = P3;
+ValeurCmp = ISP;
+IdModule  = pin_array_3x2;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A5900;
+Reference = Q1;
+ValeurCmp = IRML9301TFPbF;
+IdModule  = SOT23GDS;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A7241;
+Reference = R1;
+ValeurCmp = 22;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A7250;
+Reference = R2;
+ValeurCmp = 22;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A79B7;
+Reference = R3;
+ValeurCmp = 220k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A79DA;
+Reference = R4;
+ValeurCmp = 1k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A87F2;
+Reference = R5;
+ValeurCmp = 610;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A8AFB;
+Reference = R6;
+ValeurCmp = 2k;
+IdModule  = SM0603;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A5ECF;
+Reference = U1;
+ValeurCmp = A4988;
+IdModule  = A4988;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A5FC0;
+Reference = U2;
+ValeurCmp = MC78L05A;
+IdModule  = so-8;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A7C7E;
+Reference = U3;
+ValeurCmp = RECEIVER;
+IdModule  = Receiver;
+EndCmp
+
+BeginCmp
+TimeStamp = /569A72ED;
+Reference = X1;
+ValeurCmp = 8MHz;
+IdModule  = Q_49U3HMS;
+EndCmp
+
+EndListe

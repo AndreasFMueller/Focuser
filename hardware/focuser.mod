@@ -1,0 +1,269 @@
+PCBNEW-LibModule-V1  Sat 16 Jan 2016 08:19:40 PM CET
+# encoding utf-8
+Units mm
+$INDEX
+A4988
+FSM-SM
+Power
+Receiver
+$EndINDEX
+$MODULE A4988
+Po 0 0 0 15 55ABC4FA 00000000 ~~
+Li A4988
+Sc 0
+AR 
+Op 0 0 0
+T0 0 -1.27 1 1 0 0.15 N V 21 N "A4988"
+T1 0 1.27 1 1 0 0.15 N V 21 N "VAL**"
+DS -7.62 -10.16 7.62 -10.16 0.15 21
+DS 7.62 -10.16 7.62 10.16 0.15 21
+DS 7.62 10.16 -7.62 10.16 0.15 21
+DS -7.62 10.16 -7.62 -10.16 0.15 21
+$PAD
+Sh "1" R 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -6.35 -8.89
+$EndPAD
+$PAD
+Sh "2" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -6.35 -6.35
+$EndPAD
+$PAD
+Sh "3" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -6.35 -3.81
+$EndPAD
+$PAD
+Sh "4" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -6.35 -1.27
+$EndPAD
+$PAD
+Sh "5" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -6.35 1.27
+$EndPAD
+$PAD
+Sh "6" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -6.35 3.81
+$EndPAD
+$PAD
+Sh "7" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -6.35 6.35
+$EndPAD
+$PAD
+Sh "8" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -6.35 8.89
+$EndPAD
+$PAD
+Sh "9" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 6.35 8.89
+$EndPAD
+$PAD
+Sh "10" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 6.35 6.35
+$EndPAD
+$PAD
+Sh "11" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 6.35 3.81
+$EndPAD
+$PAD
+Sh "12" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 6.35 1.27
+$EndPAD
+$PAD
+Sh "13" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 6.35 -1.27
+$EndPAD
+$PAD
+Sh "14" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 6.35 -3.81
+$EndPAD
+$PAD
+Sh "15" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 6.35 -6.35
+$EndPAD
+$PAD
+Sh "16" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po 6.35 -8.89
+$EndPAD
+$EndMODULE A4988
+$MODULE FSM-SM
+Po 0 0 0 15 55AE9BAA 00000000 ~~
+Li FSM-SM
+Sc 0
+AR 
+Op 0 0 0
+T0 0 0 1 1 0 0.15 N V 21 N "FSM-SM"
+T1 0 0 1 1 0 0.15 N V 21 N "VAL**"
+DS -3 -1.75 -3 1.75 0.15 21
+DS -3 1.75 3 1.75 0.15 21
+DS 3 1.75 3 -1.75 0.15 21
+DS 3 -1.75 -3 -1.75 0.15 21
+$PAD
+Sh "1" R 2.1 1.6 0 0 0
+Dr 0 0 0
+At SMD N 00888000
+Ne 0 ""
+Po -4.55 0
+$EndPAD
+$PAD
+Sh "2" R 2.1 1.6 0 0 0
+Dr 0 0 0
+At SMD N 00888000
+Ne 0 ""
+Po 4.55 0
+$EndPAD
+$EndMODULE FSM-SM
+$MODULE Power
+Po 0 0 0 15 55ABD909 00000000 ~~
+Li Power
+Sc 0
+AR 
+Op 0 0 0
+T0 0 -2.54 1 1 0 0.15 N V 21 N "Power"
+T1 0 2.54 1 1 0 0.15 N V 21 N "VAL**"
+DS -5 -6.76 4 -6.76 0.15 21
+DS 4 -6.76 4 6.76 0.15 21
+DS 4 6.76 -5 6.76 0.15 21
+DS -5 6.76 -5 -6.76 0.15 21
+$PAD
+Sh "2" R 3.8 6.35 0 0 0
+Dr 0 0 0
+At SMD N 00888000
+Ne 0 ""
+Po -7.19 0
+$EndPAD
+$PAD
+Sh "1" R 3.3 4.06 0 0 0
+Dr 0 0 0
+At SMD N 00888000
+Ne 0 ""
+Po 0 -9.14
+$EndPAD
+$PAD
+Sh "2" R 3.3 6.35 0 0 0
+Dr 0 0 0
+At SMD N 00888000
+Ne 0 ""
+Po 6.1 0
+$EndPAD
+$EndMODULE Power
+$MODULE Receiver
+Po 0 0 0 15 569A97BD 00000000 ~~
+Li Receiver
+Sc 0
+AR 
+Op 0 0 0
+T0 0 -2.54 1 1 0 0.15 N V 21 N "Receiver"
+T1 0 2.54 1 1 0 0.15 N V 21 N "VAL**"
+DS -11.43 -15.24 -11.43 -7.62 0.15 21
+DS -11.43 -7.62 -3.81 -7.62 0.15 21
+DS -3.81 -7.62 -3.81 -15.24 0.15 21
+DS -3.81 -15.24 -11.43 -15.24 0.15 21
+DS -12.7 17.78 11.43 17.78 0.15 21
+DS 11.43 17.78 11.43 -16.51 0.15 21
+DS 11.43 -16.51 -12.7 -16.51 0.15 21
+DS -12.7 -16.51 -12.7 17.78 0.15 21
+$PAD
+Sh "1" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -10.16 -2.54
+$EndPAD
+$PAD
+Sh "2" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -10.16 0
+$EndPAD
+$PAD
+Sh "3" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -10.16 2.54
+$EndPAD
+$PAD
+Sh "4" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -10.16 5.08
+$EndPAD
+$PAD
+Sh "5" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -10.16 7.62
+$EndPAD
+$PAD
+Sh "6" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -10.16 10.16
+$EndPAD
+$PAD
+Sh "7" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -10.16 12.7
+$EndPAD
+$PAD
+Sh "8" C 1.6 1.6 0 0 0
+Dr 1.1 0 0
+At STD N 00E0FFFF
+Ne 0 ""
+Po -10.16 15.24
+$EndPAD
+$EndMODULE Receiver
+$EndLIBRARY
