@@ -6,6 +6,7 @@
 #include <receiver.h>
 #include <avr/io.h>
 #include <led.h>
+#include <motor.h>
 
 /**
  * \brief get the current button state output by the receiver

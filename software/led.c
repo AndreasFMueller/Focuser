@@ -4,6 +4,7 @@
  * (c) 2016 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
 #include <led.h>
+#include <avr/io.h>
 
 void	led_on() {
 	PORTC &= ~_BV(PORTC7);
@@ -23,6 +24,6 @@ void	led_value(unsigned char v) {
 
 void	led_setup(void) __attribute__ ((constructor));
 void	led_setup(void) {
-	PORTC |= _BV(PORTC7):
+	PORTC |= _BV(PORTC7);
 	DDRC |= _BV(DDC7);
 }

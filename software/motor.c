@@ -5,6 +5,8 @@
  */
 #include <motor.h>
 #include <avr/io.h>
+#include <LUFA/Platform/Platform.h>
+#include <LUFA/Drivers/USB/USB.h>
 
 #define	MOTOR_ENABLE	PORTC2
 #define MOTOR_MS1	PORTC4
@@ -17,20 +19,33 @@
 
 #define	MS_MASK		(_BV(PORTC4)|_BV(PORTC5)|_BV(PORTC6))
 
+/**
+ * \brief Set the motor stepping mode
+ */
 void	motor_set_step(unsigned char step) {
 	unsigned char	c = PORTC;
 	c = (c & ~MS_MASK) | ((step << 4) & MS_MASK);
 	PORTC = c;
 }
 
+/**
+ * \brief Get the motor stepping mode
+ */
 unsigned char	motor_get_step() {
-	return (PORT & MS_MASK) >> 4;
+	return (PORTC & MS_MASK) >> 4;
 }
 
 static unsigned short	current;
 static unsigned short	target;
 static unsigned char	speed = SPEED_SLOW;
 static unsigned char	slow;
+
+/**
+ * \brief Get the current motor position
+ */
+unsigned short	motor_current() {
+	return current;
+}
 
 static unsigned short	lastsaved;
 static unsigned long	timelastchanged = 0;
@@ -56,7 +71,7 @@ unsigned short	motor_target() {
  * differs from the target, an impuls to the stepper motor driver is generated.
  * The current position in the variable current is then incremented.
  */
-void	motor_handle() {
+void	motor_handler() {
 	if (current == target) {
 		if (timelastchanged < 0xffffffff) {
 			timelastchanged++;
@@ -82,10 +97,10 @@ void	motor_handle() {
 }
 
 void	motor_moveto(unsigned short position, unsigned char _speed) {
-	GlobalInterrupDisable();
+	GlobalInterruptDisable();
 	target = position;
 	speed = _speed;
-	GlobalInterrupEnable();
+	GlobalInterruptEnable();
 }
 
 /**
@@ -95,11 +110,11 @@ void	motor_moveto(unsigned short position, unsigned char _speed) {
  * which implies that there is no need to step any further.
  */
 void	motor_stop() {
-	GlobalInterrupDisable();
+	GlobalInterruptDisable();
 	if (current != target) {
 		target = current;
 	}
-	GlobalInterrupEnable();
+	GlobalInterruptEnable();
 }
 
 void	motor_setup(void) __attribute__ ((constructor));
@@ -110,7 +125,7 @@ void	motor_setup(void) __attribute__ ((constructor));
  * initialize the outputs to the Pololu stepper driver.
  */
 void	motor_setup(void) {
-	motor_step_step(MOTOR_FULL);
+	motor_set_step(STEP_FULL);
 	PORTC |= _BV(MOTOR_ENABLE);
 	PORTB &= ~_BV(MOTOR_SLEEP);
 	PORTB &= ~_BV(MOTOR_STEP);
