@@ -6,8 +6,8 @@
 #ifndef _motor_h
 #define _motor_h
 
-#define	MOTOR_SLOW	0
-#define MOTOR_FAST	1
+#define	SPEED_SLOW	0
+#define SPEED_FAST	1
 
 #define STEP_FULL	0x0
 #define STEP_HALF	0x1
@@ -15,7 +15,7 @@
 #define STEP_EIGHTH	0x3
 #define STEP_SIXTEENTH	0x7
 
-void	motor_set_stepping(unsigned char stepping);
+void	motor_set_step(unsigned char step);
 unsigned char	motor_get_stepping();
 
 void	motor_moveto(unsigned short position, unsigned char speed);

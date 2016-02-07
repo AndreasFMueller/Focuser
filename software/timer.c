@@ -12,12 +12,12 @@
 #include <timer.h>
 
 void	timer_start() {
-	TIMSK1 |= _BV(OCIE1);
-	wdt_enable();
+	TIMSK1 |= _BV(OCIE1A);
+	wdt_enable(WDTO_250MS);
 }
 
 void	timer_stop() {
-	TIMSK1 &= ~_BV(OCIE1);
+	TIMSK1 &= ~_BV(OCIE1A);
 	wdt_disable();
 }
 
@@ -30,6 +30,7 @@ void	timer_setup(void) {
 	TIMSK1 = _BV(OCIE1A);
 }
 
+extern void	recv_handler();
 extern void	motor_handler();
 
 ISR(TIMER1_COMPA_vect) {

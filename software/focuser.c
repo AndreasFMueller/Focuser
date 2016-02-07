@@ -9,27 +9,28 @@
 #include <LUFA/Platform/Platform.h>
 #include <LUFA/Drivers/USB/USB.h>
 #include <avr/wdt.h>
+#include <util/delay.h>
 #include <timer.h>
+#include <led.h>
 
 /**
  * /brief Main function for the focuser firmware
  */
 int	main(int argc, char *argv[]) {
 	// initialize the 
-	unsigned char	d = 255;
+	unsigned char	d = 10;
 	led_on();
-	while (d) {
-		_delay_ms(d * 5);
+	while (d--) {
+		_delay_ms(100);
 		led_off();
-		_delay_ms(d * 5);
+		_delay_ms(100);
 		led_on();
-		d >>= 1;
 	}
 	led_off();
 
 	// initialize USB, but USB requests will only be handled when
 	// interrupts are enabled below
-	USB_Init(USB_DEIVCE_OPT_FULLSPEED);
+	USB_Init(USB_DEVICE_OPT_FULLSPEED);
 
 	// start the timer, this also enables the watchdog timer
 	timer_start();
@@ -41,7 +42,7 @@ int	main(int argc, char *argv[]) {
 	for (;;) { }
 }
 
-void	 wdt_init(void) __atribute((naked)) __attribute((section(".init")));
+void	 wdt_init(void) __attribute((naked)) __attribute((section(".init")));
 
 /**
  * \brief method enable the watchdog timer

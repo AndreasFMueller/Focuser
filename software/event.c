@@ -10,6 +10,7 @@
 #include <receiver.h>
 #include <LUFA/Drivers/USB/Core/Events.h>
 #include <avr/wdt.h>
+#include <motor.h>
 
 /**
  * \brief RESET request
@@ -34,7 +35,7 @@ void	process_set() {
 	Endpoint_ClearSETUP();
 	Endpoint_ClearStatusStage();
 	motor_moveto(USB_ControlRequest.wValue,
-		(USB_ControlRequest.wIndex) ? SPEED_HIGH : SPEED_SLOW);
+		(USB_ControlRequest.wIndex) ? SPEED_FAST : SPEED_SLOW);
 }
 
 /**
@@ -89,7 +90,7 @@ void	process_get() {
  */
 void	process_recv() {
 	Endpoint_ClearSETUP();
-	unsigned char	v = get_recv();
+	unsigned char	v = recv_get();
 	Endpoint_Write_Control_Stream_LE((void *)&v, 1);
 	Endpoint_ClearOUT();
 }
@@ -103,20 +104,20 @@ void	EVENT_USB_Device_ControlRequest() {
 	if (is_control()) {
 		if (is_incoming()) {
 			switch (USB_ControlRequest.bRequest) {
-			case GUIDERPORT_RESET:
+			case FOCUSER_RESET:
 				process_reset();
 				break;
-			case GUIDERPORT_SET:
+			case FOCUSER_SET:
 				process_set();
 				break;
-			case GUIDERPORT_LOCK:
+			case FOCUSER_LOCK:
 				process_lock();
 				break;
 			}
 		}
 		if (is_outgoing()) {
 			switch (USB_ControlRequest.bRequest) {
-			case GUIDERPORT_GET:
+			case FOCUSER_GET:
 				process_get();
 				break;
 			}
