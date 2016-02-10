@@ -41,8 +41,8 @@ unsigned char	motor_get_step() {
 	return (PORTC & MS_MASK) >> 4;
 }
 
-static unsigned short	current;
-static unsigned short	target;
+static volatile unsigned short	current;
+static volatile unsigned short	target;
 static unsigned char	speed = SPEED_SLOW;
 static unsigned char	slow;
 
@@ -58,7 +58,7 @@ unsigned short	motor_speed() {
 }
 
 volatile unsigned short	lastsaved;
-static unsigned long	timelastchanged = 0;
+static volatile uint32_t	timelastchanged = 0;
 
 /**
  * \brief Get the current target setting
@@ -71,7 +71,7 @@ unsigned short	motor_target() {
 	return target;
 }
 
-#define	DIVISOR_FAST	1
+#define	DIVISOR_FAST	2
 #define DIVISOR_SLOW	16
 
 /**

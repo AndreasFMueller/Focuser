@@ -279,7 +279,7 @@ int	main(int argc, char *argv[]) {
 		rc = libusb_control_transfer(handle,
 			LIBUSB_REQUEST_TYPE_VENDOR |
 			LIBUSB_RECIPIENT_DEVICE |
-			LIBUSB_ENDPOINT_IN, FOCUSER_GET, 
+			LIBUSB_ENDPOINT_IN, FOCUSER_SAVED, 
 			0, 0, (unsigned char *)&result, 2, 1000);
 		if (rc < 0) {
 			fprintf(stderr, "cannot send GET: %s\n", 
