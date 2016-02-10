@@ -8,11 +8,14 @@
 #include <led.h>
 #include <motor.h>
 
+static unsigned char	last = 0;
+static unsigned char	locked = 0;
+
 /**
  * \brief get the current button state output by the receiver
  */
 unsigned char	recv_get() {
-	return PIN7 >> 3;
+	return (PIN7 >> 3) | ((locked) ? 0x80 : 0x00);
 }
 
 void	recv_setup(void) __attribute__ ((constructor));
@@ -21,9 +24,6 @@ void	recv_setup(void) {
 	PORTD |= _BV(PORTD7)|_BV(PORT6)|_BV(PORT5)|_BV(PORT4)|_BV(PORT3);
 	DDRD &= ~(_BV(DDD7)|_BV(DDD6)|_BV(DDD5)|_BV(DDD4)|_BV(DDD3));
 }
-
-static unsigned char	last = 0;
-static unsigned char	locked = 0;
 
 /**
  * \brief Lock the device

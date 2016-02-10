@@ -18,6 +18,9 @@
 #define	FOCUSER_GET	1
 #define FOCUSER_SET	2
 #define FOCUSER_LOCK	3
+#define FOCUSER_RCVR	4
+#define FOCUSER_STOP	5
+#define FOCUSER_SAVED	6
 
 /**
  * \brief Event handle for control requests

@@ -13,7 +13,7 @@
 
 void	timer_start() {
 	TIMSK1 |= _BV(OCIE1A);
-	wdt_enable(WDTO_250MS);
+	wdt_enable(WDTO_15MS);
 }
 
 void	timer_stop() {
@@ -23,8 +23,8 @@ void	timer_stop() {
 
 void	timer_setup(void) __attribute__ ((constructor));
 void	timer_setup(void) {
-	// prescaler 8 or 1, default is 1, CTC
-	TCCR1B = (0x2 << CS10) | (1 << WGM12); 
+	// prescaler 8 = 0x2 or 1 = 0x1, default is 1, CTC
+	TCCR1B = (0x1 << CS10) | (1 << WGM12); 
 	TCCR1A = 0;
 	OCR1A = 1000;
 	TIMSK1 = _BV(OCIE1A);
@@ -33,8 +33,12 @@ void	timer_setup(void) {
 extern void	recv_handler();
 extern void	motor_handler();
 
+uint8_t	resetflag = 1;
+
 ISR(TIMER1_COMPA_vect) {
 	motor_handler();
 	recv_handler();
-	wdt_reset();
+	if (resetflag) {
+		wdt_reset();
+	}
 }

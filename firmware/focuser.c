@@ -12,13 +12,14 @@
 #include <util/delay.h>
 #include <timer.h>
 #include <led.h>
+#include <motor.h>
 
 /**
  * /brief Main function for the focuser firmware
  */
 int	main(int argc, char *argv[]) {
 	// initialize the 
-	unsigned char	d = 10;
+	unsigned short	d = 10;
 	led_on();
 	while (d--) {
 		_delay_ms(100);
@@ -39,13 +40,17 @@ int	main(int argc, char *argv[]) {
 	GlobalInterruptEnable();
 
 	// do nothing	
-	for (;;) { }
+	for (;;) {
+		if (saveneeded) {
+			motor_save();
+		}
+	}
 }
 
-void	 wdt_init(void) __attribute((naked)) __attribute((section(".init")));
+void	 wdt_init(void) __attribute((naked)) __attribute((section(".init3")));
 
 /**
- * \brief method enable the watchdog timer
+ * \brief method to initialize the watchdog timer
  *
  * The attributes set for this function above are designed so that
  * the function is automatically called in the startup sequence.

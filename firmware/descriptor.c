@@ -50,7 +50,7 @@ const USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 
 		.ConfigAttributes       = USB_CONFIG_ATTR_RESERVED,
 
-		.MaxPowerConsumption    = USB_CONFIG_POWER_MA(100)
+		.MaxPowerConsumption    = USB_CONFIG_POWER_MA(50)
 	},
 };
 
@@ -59,11 +59,11 @@ const USB_Descriptor_String_t PROGMEM LanguageString
 const USB_Descriptor_String_t PROGMEM ManufacturerString
 	= USB_STRING_DESCRIPTOR(L"Andreas Mueller");
 const USB_Descriptor_String_t PROGMEM ProductString
-	= USB_STRING_DESCRIPTOR(L"Focuser    " VERSION);
+	= USB_STRING_DESCRIPTOR(L"Focuser " VERSION);
 
 // CONFIGURATION: serial number
 const USB_Descriptor_String_t EEMEM SerialNumberString
-	= USB_STRING_DESCRIPTOR(L"20160125");
+	= USB_STRING_DESCRIPTOR(L"20160210");
 
 /**
  * \brief Get descriptors

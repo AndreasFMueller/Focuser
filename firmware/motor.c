@@ -7,6 +7,8 @@
 #include <avr/io.h>
 #include <LUFA/Platform/Platform.h>
 #include <LUFA/Drivers/USB/USB.h>
+#include <avr/eeprom.h>
+#include <led.h>
 
 #define	MOTOR_ENABLE	PORTC2
 #define MOTOR_MS1	PORTC4
@@ -18,6 +20,10 @@
 #define MOTOR_DIR	PORTB4
 
 #define	MS_MASK		(_BV(PORTC4)|_BV(PORTC5)|_BV(PORTC6))
+
+uint16_t	EEMEM	position = 0x8000;
+
+volatile unsigned char	saveneeded = 0;
 
 /**
  * \brief Set the motor stepping mode
@@ -47,7 +53,11 @@ unsigned short	motor_current() {
 	return current;
 }
 
-static unsigned short	lastsaved;
+unsigned short	motor_speed() {
+	return speed;
+}
+
+volatile unsigned short	lastsaved;
 static unsigned long	timelastchanged = 0;
 
 /**
@@ -61,8 +71,18 @@ unsigned short	motor_target() {
 	return target;
 }
 
-#define	DIVISOR_FAST	2
+#define	DIVISOR_FAST	1
 #define DIVISOR_SLOW	16
+
+/**
+ * \brief save the current value
+ */
+void	motor_save() {
+	GlobalInterruptDisable();
+	eeprom_write_word(&position, lastsaved);
+	saveneeded = 0;
+	GlobalInterruptEnable();
+}
 
 /**
  * \brief Handler called from the timer interrupt
@@ -76,10 +96,14 @@ void	motor_handler() {
 		if (timelastchanged < 0xffffffff) {
 			timelastchanged++;
 		}
+		if (timelastchanged == 120000) {
+			lastsaved = current;
+			saveneeded = 1;
+		}
 		return;
 	}
 	// set the direction
-	if (--slow) {
+	if (0 == --slow) {
 		if (target > current) {
 			PORTB |= _BV(MOTOR_DIR);
 			current++;
@@ -134,7 +158,7 @@ void	motor_setup(void) {
 	DDRC |= 0x74;
 	DDRB |= 0xf0;
 	// read the current value from the EEPROM
-	current = eeprom_read_word(16);
+	current = eeprom_read_word(&position);
 	lastsaved = current;
 	// set the target also to the current, so we don't move anything
 	target = current;

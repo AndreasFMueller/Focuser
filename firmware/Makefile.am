@@ -30,17 +30,16 @@ noinst_PROGRAMS = focuser
 
 AVRDUDE = avrdude -v -p usb162 -b 115200 -c avrispmkII -P usb
 
-flash:	focuser.hex
-	$(AVRDUDE) -U flash:w:focuser.hex
-eeprom:	focuser.eeprom
-	$(AVRDUDE) -U eeprom:w:focuser.eeprom
+flash:	focuser.hex focuser.eeprom
+	$(AVRDUDE) -U flash:w:focuser.hex -U eeprom:w:focuser.eeprom
 
 focuser.hex: focuser
-	avr-objcopy --remove-section=.eeprom --target=ihex focuser \
-		focuser.hex
+	avr-objcopy --remove-section=.eeprom --target=ihex \
+		focuser focuser.hex
 focuser.eeprom: focuser
-	avr-objcopy --only-section=.eeprom --target=ihex focuser \
-		focuser.eeprom
+	avr-objcopy --only-section=.eeprom --target=ihex \
+		--change-section-lma .eeprom=0 \
+		focuser focuser.eeprom
 
 lib_LTLIBRARIES = libfocuser.la
 
@@ -100,6 +99,8 @@ readback.hex:
 
 read:
 	$(AVRDUDE) -U eeprom:r:eeprom.raw:r -u
+read.hex:
+	$(AVRDUDE) -U eeprom:r:read.hex:i
 
 size:   focuser
 	avr-size *.o focuser

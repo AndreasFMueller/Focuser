@@ -11,6 +11,7 @@
 #include <LUFA/Drivers/USB/Core/Events.h>
 #include <avr/wdt.h>
 #include <motor.h>
+#include <timer.h>
 
 /**
  * \brief RESET request
@@ -21,7 +22,13 @@
 void	process_reset() {
 	Endpoint_ClearSETUP();
 	Endpoint_ClearStatusStage();
-	wdt_enable(WDTO_15MS);
+	// the usual method to set the watchdog timer timeout to
+	// a short time does not really work, because interrupts happen
+	// so often in this application. We use the reset flag from
+	// the timer, which tells the timer interrupt no longer to reset
+	// the watchdog timer, which will utlimately cause a watch dog timer
+	// reset
+	resetflag = 0;
 }
 
 /**
@@ -34,6 +41,10 @@ void	process_reset() {
 void	process_set() {
 	Endpoint_ClearSETUP();
 	Endpoint_ClearStatusStage();
+	if ((USB_ControlRequest.wValue == 0)
+		|| (USB_ControlRequest.wValue == 0xffff)) {
+		return;
+	}
 	motor_moveto(USB_ControlRequest.wValue,
 		(USB_ControlRequest.wIndex) ? SPEED_FAST : SPEED_SLOW);
 }
@@ -53,6 +64,17 @@ void	process_lock() {
 	}
 }
 
+/**
+ * \brief STOP request
+ *
+ * The stop request works by setting the target to the current counter state
+ */
+void	process_stop() {
+	Endpoint_ClearSETUP();
+	Endpoint_ClearStatusStage();
+	motor_stop();
+}
+
 #define	is_control() \
 	((USB_ControlRequest.bmRequestType & CONTROL_REQTYPE_TYPE) 	\
 		== REQTYPE_VENDOR) 					\
@@ -69,29 +91,40 @@ void	process_lock() {
 		== REQDIR_DEVICETOHOST)
 
 /**
- * \brief Get the current LED state
+ * \brief Get the current focuser state
  *
  * The GET request returns a single byte containing the state of all
  * the output ports.
  */
 void	process_get() {
 	Endpoint_ClearSETUP();
-	unsigned short	v[2];
+	unsigned short	v[3];
 	v[0] = motor_current();
 	v[1] = motor_target();
-	Endpoint_Write_Control_Stream_LE((void *)&v, 4);
+	v[2] = motor_speed();
+	Endpoint_Write_Control_Stream_LE((void *)v, 6);
 	Endpoint_ClearOUT();
 }
 
 /**
- * \brief GET RECV request
+ * \brief RCVR request implementation
  *
  * retrieve the current state of the input pins from the RF receiver
  */
-void	process_recv() {
+void	process_rcvr() {
 	Endpoint_ClearSETUP();
 	unsigned char	v = recv_get();
 	Endpoint_Write_Control_Stream_LE((void *)&v, 1);
+	Endpoint_ClearOUT();
+}
+
+/**
+ * \brief SAVED request implementation
+ */
+void	process_saved() {
+	Endpoint_ClearSETUP();
+	unsigned short	v = lastsaved;
+	Endpoint_Write_Control_Stream_LE((void *)&v, 2);
 	Endpoint_ClearOUT();
 }
 
@@ -113,12 +146,21 @@ void	EVENT_USB_Device_ControlRequest() {
 			case FOCUSER_LOCK:
 				process_lock();
 				break;
+			case FOCUSER_STOP:
+				process_stop();
+				break;
 			}
 		}
 		if (is_outgoing()) {
 			switch (USB_ControlRequest.bRequest) {
 			case FOCUSER_GET:
 				process_get();
+				break;
+			case FOCUSER_RCVR:
+				process_rcvr();
+				break;
+			case FOCUSER_SAVED:
+				process_saved();
 				break;
 			}
 		}
