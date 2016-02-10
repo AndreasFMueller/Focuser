@@ -84,7 +84,7 @@ void	recv_handler() {
 		motor_moveto(0xffff, speed);
 		break;
 	case 0x2:
-		motor_moveto(0, speed);
+		motor_moveto(1, speed);
 		break;
 	case 0x0:
 	case 0x3:
