@@ -97,11 +97,14 @@ void	motor_handler() {
 			timelastchanged++;
 		}
 		if (timelastchanged == 120000) {
-			lastsaved = current;
-			saveneeded = 1;
+			if (lastsaved != current) {
+				lastsaved = current;
+				saveneeded = 1;
+			}
 		}
 		return;
 	}
+	timelastchanged = 0;
 	// set the direction
 	if (0 == --slow) {
 		if (target > current) {
@@ -116,7 +119,6 @@ void	motor_handler() {
 		PORTB &= ~_BV(MOTOR_STEP);
 		// set the speed divisor to the appropriate value
 		slow = (speed == SPEED_FAST) ? DIVISOR_FAST : DIVISOR_SLOW;
-		timelastchanged = 0;
 	}
 }
 
