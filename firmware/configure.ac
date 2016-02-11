@@ -1,14 +1,14 @@
 #
 # process this file with autoconf to produce the configure script
 #
-# (c) 2009 Prof Dr Andreas Mueller, Hochschule Rapperswil
+# (c) 2016 Prof Dr Andreas Mueller, Hochschule Rapperswil
 # $Id$
 #
 AC_PREREQ(2.57)
-AC_REVISION([1.0])
+AC_REVISION([1.1])
 AC_INIT
 AC_CONFIG_SRCDIR([focuser.c])
-AM_INIT_AUTOMAKE(focuser, 1.0)
+AM_INIT_AUTOMAKE(focuser, 1.1)
 AC_CONFIG_HEADERS(config.h)
 
 AM_PROG_LIBTOOL

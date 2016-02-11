@@ -43,9 +43,10 @@ focuser.eeprom: focuser
 
 lib_LTLIBRARIES = libfocuser.la
 
-noinst_HEADERS = led.h motor.h timer.h receiver.h descriptor.h event.h
+noinst_HEADERS = led.h motor.h timer.h receiver.h descriptor.h event.h serial.h
 
 libfocuser_la_SOURCES = led.c motor.c timer.c receiver.c descriptor.c event.c \
+	serial.c \
 	$(LUFA_SRC_USB_DEVICE)
 
 focuser_SOURCES = focuser.c

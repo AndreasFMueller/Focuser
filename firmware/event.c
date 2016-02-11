@@ -12,6 +12,7 @@
 #include <avr/wdt.h>
 #include <motor.h>
 #include <timer.h>
+#include <serial.h>
 
 /**
  * \brief RESET request
@@ -73,6 +74,23 @@ void	process_stop() {
 	Endpoint_ClearSETUP();
 	Endpoint_ClearStatusStage();
 	motor_stop();
+}
+
+/**
+ * \brief SERIAL request
+ *
+ * read the new serial number in ascii from the USB and copy it into the
+ * 
+ */
+void	process_serial() {
+	Endpoint_ClearSETUP();
+	unsigned char	l = USB_ControlRequest.wLength;
+	if (l <= 7) {
+		Endpoint_Read_Control_Stream_LE(serialbuffer, l);
+	}
+	Endpoint_ClearIN();
+	serialbuffer[l] = '\0';
+	newserial = 1;
 }
 
 #define	is_control() \
@@ -148,6 +166,9 @@ void	EVENT_USB_Device_ControlRequest() {
 				break;
 			case FOCUSER_STOP:
 				process_stop();
+				break;
+			case FOCUSER_SERIAL:
+				process_serial();
 				break;
 			}
 		}

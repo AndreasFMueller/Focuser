@@ -64,6 +64,7 @@ char	*libusb_strerror(int rc) {
 #define FOCUSER_RCVR	4
 #define FOCUSER_STOP	5
 #define FOCUSER_SAVED	6
+#define FOCUSER_SERIAL	7
 
 /*
  * display the descriptors, for tesing
@@ -139,22 +140,48 @@ void	show_version() {
  * Show usage message
  */
 void	usage(const char *progname) {
-	printf("usage:\n");
-	printf("  %s [ options ] descriptors\n", progname);
-	printf("  %s [ options ] set <value>\n", progname);
+	printf("Client program to control the othello Focuser controller hardware.\n");
+	printf("Usage:\n\n");
 	printf("  %s [ options ] get\n", progname);
-	printf("  %s [ options ] stop\n", progname);
+	printf("  %s [ options ] set <value>\n", progname);
+	printf("  %s [ options ] up\n", progname);
+	printf("  %s [ options ] down\n", progname);
+	printf("  %s [ options ] stop\n\n", progname);
+	printf("To move the focuser to a new position, use the set command. Fast moves can\n");
+	printf("be done using the -f option. Stop movement with the stop command, and stay\n");
+	printf("informed about the current position of the moving focuser using the get\n");
+	printf("command. The up and down commands are equivalent to setting the extreme\n");
+	printf("values of the focuser.\n\n");
 	printf("  %s [ options ] receiver\n", progname);
-	printf("  %s [ options ] [ lock | unlock ]\n", progname),
+	printf("  %s [ options ] [ lock | unlock ]\n\n", progname),
+	printf("Get information about the receiver buttons, lock or unlock the them\n\n");
 	printf("  %s [ options ] reset\n", progname);
-	printf("options:\n");
-	printf(" -d            enablue USB debugging\n");
-	printf(" -h,-?         display this help and exit\n");
-	printf(" -V            show version of USB library and exit\n");
-	printf(" -v <vid>      use this vendor id to connect\n");
-	printf(" -p <pid>      use this product id to connect\n");
-	printf(" -f            fast movement (set command only)\n");
+	printf("  %s [ options ] descriptors\n", progname);
+	printf("  %s [ options ] serial <serial>\n", progname);
+	printf("  %s [ options ] help\n\n", progname);
+	printf("The reset command reboots the focuser hardware. The descriptors command\n");
+	printf("displays the USB descriptors of the device, shows serial number among others.\n");
+	printf("The help command displays this message, just like the --help option.\n\n");
+	printf("Options:\n");
+	printf("  -d,--debug           enable USB debugging\n");
+	printf("  -f,--fast            fast movement (500 steps/s instead of 62, \n");
+	printf("                       set command only\n");
+	printf("  -h,-?,--help         display this help and exit\n");
+	printf("  -p,--product=<pid>   use this product id to connect (default 0x1235)\n");
+	printf("  -v,--vendor=<vid>    use this vendor id to connect (default 0xf055)\n");
+	printf("  -V,--version         show version of USB library and exit\n");
 }
+
+
+static struct option	longopts[] = {
+{ "debug",		no_argument,		NULL,	'd' },
+{ "fast",		no_argument,		NULL,	'f' },
+{ "help",		no_argument,		NULL,	'h' },
+{ "vendor",		required_argument,	NULL,	'v' },
+{ "product",		required_argument,	NULL,	'p' },
+{ "version",		no_argument,		NULL,	'V' },
+{ NULL,			0,			NULL,	 0  }
+};
 
 /*
  * Main function of the client program
@@ -166,7 +193,9 @@ int	main(int argc, char *argv[]) {
 	uint16_t	vid = 0xf055;
 	uint16_t	pid = 0x1235;
 	int	fast = 0;
-	while (EOF != (c = getopt(argc, argv, "dfh?v:p:V")))
+	int	longindex;
+	while (EOF != (c = getopt_long(argc, argv, "dfh?v:p:V",
+			longopts, &longindex)))
 		switch (c) {	
 		case 'd':
 			debug = 1;
@@ -196,6 +225,13 @@ int	main(int argc, char *argv[]) {
 	}
 	char	*command = argv[optind++];
 
+	// handle the help command, just for completeness
+	if (0 == strcmp(command, "help")) {
+		usage(argv[0]);
+		return EXIT_SUCCESS;
+	}
+	
+
 	// initialize libusb library
 	libusb_context	*context;
 	libusb_init(&context);
@@ -218,23 +254,39 @@ int	main(int argc, char *argv[]) {
 	// commands below may need to evaluate the USB return code
 	int		rc;
 
+	// the command interpreter for commands using the same USB commands
+	// usually starts off with the command set to an invalid command,
+	// and aonly does something, if the command is set
+	uint8_t		cmd = 0xff;
+
 	// all commands need value and index, so we allocate these variables
 	// only once
 	uint16_t	value;
 	uint16_t	index;
 
 	// set command implementation
+	index = (fast) ? 1 : 0;
 	if (0 == strcmp(command, "set")) {
 		if (optind >= argc) {
 			fprintf(stderr, "no argument to set given\n");
 			return EXIT_SUCCESS;
 		}
 		value = atoi(argv[optind++]);
-		index = (fast) ? 1 : 0;
+		cmd = FOCUSER_SET;
+	}
+	if (0 == strcmp(command, "up")) {
+		value = 0xffff;
+		cmd = FOCUSER_SET;
+	}
+	if (0 == strcmp(command, "down")) {
+		value = 0x1;
+		cmd = FOCUSER_SET;
+	}
+	if (cmd == FOCUSER_SET) {
 		rc = libusb_control_transfer(handle,
 			LIBUSB_REQUEST_TYPE_VENDOR |
 			LIBUSB_RECIPIENT_DEVICE |
-			LIBUSB_ENDPOINT_OUT, FOCUSER_SET, 
+			LIBUSB_ENDPOINT_OUT, cmd, 
 			value, index, NULL, 0, 1000);
 		if (rc) {
 			fprintf(stderr, "cannot send SET: %s\n", 
@@ -318,7 +370,7 @@ int	main(int argc, char *argv[]) {
 			LIBUSB_ENDPOINT_IN, FOCUSER_RCVR, 
 			0, 0, (unsigned char *)&result, 1, 1000);
 		if (rc < 0) {
-			fprintf(stderr, "cannot send GET: %s\n", 
+			fprintf(stderr, "cannot send RCVR: %s\n", 
 				libusb_strerror(rc));
 			return EXIT_FAILURE;
 		}
@@ -336,31 +388,50 @@ int	main(int argc, char *argv[]) {
 		return EXIT_SUCCESS;
 	}
 
-	// lock command
+	// lock/unlock command
+	cmd = 0xff;
 	if (0 == strcmp(command, "lock")) {
+		index = 1;
+		cmd = FOCUSER_LOCK;
+	}
+	if (0 == strcmp(command, "unlock")) {
+		index = 0;
+		cmd = FOCUSER_LOCK;
+	}
+	if (cmd == FOCUSER_LOCK) {
 		rc = libusb_control_transfer(handle,
 			LIBUSB_REQUEST_TYPE_VENDOR |
 			LIBUSB_RECIPIENT_DEVICE |
 			LIBUSB_ENDPOINT_OUT, FOCUSER_LOCK, 
-			0, 1, NULL, 0, 1000);
+			0, index, NULL, 0, 1000);
 		if (rc) {
-			fprintf(stderr, "cannot send SET: %s\n", 
+			fprintf(stderr, "cannot send LOCK: %s\n", 
 				libusb_strerror(rc));
 			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;
 	}
 
-	// unlock command
-	if (0 == strcmp(command, "unlock")) {
+	// serial command
+	if (0 == strcmp(command, "serial")) {
+		char	*newserial = argv[optind];
+		int	l = strlen(newserial);
+		if (l > 7) {
+			fprintf(stderr, "serial string too long\n");
+			return EXIT_FAILURE;
+		}
 		rc = libusb_control_transfer(handle,
 			LIBUSB_REQUEST_TYPE_VENDOR |
 			LIBUSB_RECIPIENT_DEVICE |
-			LIBUSB_ENDPOINT_OUT, FOCUSER_LOCK, 
-			0, 0, NULL, 0, 1000);
-		if (rc) {
-			fprintf(stderr, "cannot send SET: %s\n", 
-				libusb_strerror(rc));
+			LIBUSB_ENDPOINT_OUT, FOCUSER_SERIAL, 
+			0, 0, (unsigned char *)newserial, l, 1000);
+		if (rc < 0) {
+			fprintf(stderr, "cannot send SERIAL '%s': %s\n", 
+				newserial, libusb_strerror(rc));
+			return EXIT_FAILURE;
+		}
+		if (rc != l) {
+			fprintf(stderr, "cannot send %d bytes: %d\n", l, rc);
 			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;

@@ -63,31 +63,44 @@ static unsigned short	unlockcounter = 0;
 void	recv_handler() {
 	unsigned char	now = recv_get();
 	// locking/unlocking
-	if ((now & RECV_C) && (now & RECV_D)) {
-		unlockcounter++;
-		goto done;
-	} else {
-		if (unlockcounter > 2000) {
-			locked = (locked) ? 0 : 1;
+	if (locked) {
+		if ((now & RECV_C) && (now & RECV_D)) {
+			unlockcounter++;
+			goto done;
+		} else {
+			if (unlockcounter > 2000) {
+				locked = (locked) ? 0 : 1;
+			}
+			unlockcounter = 0;
+			goto done;
 		}
-		unlockcounter = 0;
-		goto done;
+		// if the buttons are locked, we don't need to look at them
+		return;
 	}
+
 	// if the state has not changed, nothing needs to be done
 	if (now == last) {
 		return;
 	}
+
 	// handle all possible combinations 
-	unsigned char	speed = (now & RECV_C) ? SPEED_FAST : SPEED_SLOW;
-	switch (0x3 & now) {
-	case 0x1:
+	unsigned char	speed = ((now & RECV_C) || (now & RECV_D))
+				? SPEED_FAST : SPEED_SLOW;
+	unsigned char	direction = now & 0x3;
+	if (now & RECV_C) {
+		direction |= RECV_A;
+	}
+	if (now & RECV_D) {
+		direction |= RECV_B;
+	}
+	switch (direction) {
+	case RECV_A:
 		motor_moveto(0xffff, speed);
 		break;
-	case 0x2:
+	case RECV_B:
 		motor_moveto(1, speed);
 		break;
-	case 0x0:
-	case 0x3:
+	default:
 		motor_stop();
 		break;
 	}

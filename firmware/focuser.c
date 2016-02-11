@@ -13,6 +13,7 @@
 #include <timer.h>
 #include <led.h>
 #include <motor.h>
+#include <serial.h>
 
 /**
  * /brief Main function for the focuser firmware
@@ -43,6 +44,9 @@ int	main(int argc, char *argv[]) {
 	for (;;) {
 		if (saveneeded) {
 			motor_save();
+		}
+		if (newserial) {
+			serial_write();
 		}
 	}
 }
