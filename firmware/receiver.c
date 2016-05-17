@@ -15,7 +15,7 @@ static unsigned char	locked = 0;
  * \brief get the current button state output by the receiver
  */
 unsigned char	recv_get() {
-	return (PIN7 >> 3) | ((locked) ? 0x80 : 0x00);
+	return (PIND >> 3) | ((locked) ? 0x80 : 0x00);
 }
 
 void	recv_setup(void) __attribute__ ((constructor));
@@ -66,15 +66,20 @@ void	recv_handler() {
 	if (locked) {
 		if ((now & RECV_C) && (now & RECV_D)) {
 			unlockcounter++;
-			goto done;
-		} else {
-			if (unlockcounter > 2000) {
-				locked = (locked) ? 0 : 1;
-			}
-			unlockcounter = 0;
-			goto done;
+		}
+		if (unlockcounter > 2000) {
+			recv_unlock();
+			unlockcounter = 2000;
 		}
 		// if the buttons are locked, we don't need to look at them
+		last = 0;
+		return;
+	}
+
+	// if we were just unlock, ignore the buttons for two more seconds
+	if (unlockcounter) {
+		unlockcounter--;
+		last = 0;
 		return;
 	}
 

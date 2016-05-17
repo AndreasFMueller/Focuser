@@ -261,8 +261,8 @@ int	main(int argc, char *argv[]) {
 
 	// all commands need value and index, so we allocate these variables
 	// only once
-	uint16_t	value;
-	uint16_t	index;
+	uint16_t	value = 0;
+	uint16_t	index = 0;
 
 	// set command implementation
 	index = (fast) ? 1 : 0;
@@ -275,7 +275,7 @@ int	main(int argc, char *argv[]) {
 		cmd = FOCUSER_SET;
 	}
 	if (0 == strcmp(command, "up")) {
-		value = 0xffff;
+		value = 0xfffe;
 		cmd = FOCUSER_SET;
 	}
 	if (0 == strcmp(command, "down")) {
@@ -381,8 +381,8 @@ int	main(int argc, char *argv[]) {
 		printf("receiver status: %c%c%c%c%s\n",
 			(result & 0x01) ? 'A' : '_',
 			(result & 0x02) ? 'B' : '_',
-			(result & 0x03) ? 'C' : '_',
-			(result & 0x04) ? 'D' : '_',
+			(result & 0x04) ? 'C' : '_',
+			(result & 0x08) ? 'D' : '_',
 			(result & 0x80) ? " (locked)" : ""
 		);
 		return EXIT_SUCCESS;

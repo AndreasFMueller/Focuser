@@ -152,11 +152,11 @@ void	motor_setup(void) __attribute__ ((constructor));
  */
 void	motor_setup(void) {
 	motor_set_step(STEP_FULL);
-	PORTC |= _BV(MOTOR_ENABLE);
-	PORTB &= ~_BV(MOTOR_SLEEP);
+	PORTC &= ~_BV(MOTOR_ENABLE);
+	PORTB |= _BV(MOTOR_SLEEP);
 	PORTB &= ~_BV(MOTOR_STEP);
 	PORTB &= ~_BV(MOTOR_DIR);
-	PORTB |= ~_BV(MOTOR_RESET);
+	PORTB |= _BV(MOTOR_RESET);
 	DDRC |= 0x74;
 	DDRB |= 0xf0;
 	// read the current value from the EEPROM
