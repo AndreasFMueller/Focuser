@@ -72,7 +72,11 @@ unsigned short	motor_target() {
 }
 
 #define	DIVISOR_FAST	2
+#if 0
 #define DIVISOR_SLOW	16
+#else
+#define DIVISOR_SLOW	2
+#endif
 
 /**
  * \brief save the current value
@@ -126,6 +130,14 @@ void	motor_moveto(unsigned short position, unsigned char _speed) {
 	GlobalInterruptDisable();
 	target = position;
 	speed = _speed;
+	switch (speed) {
+	case SPEED_FAST:
+		motor_set_step(STEP_FULL);
+		break;
+	case SPEED_SLOW:
+		motor_set_step(STEP_SIXTEENTH);
+		break;
+	}
 	GlobalInterruptEnable();
 }
 
@@ -151,7 +163,7 @@ void	motor_setup(void) __attribute__ ((constructor));
  * initialize the outputs to the Pololu stepper driver.
  */
 void	motor_setup(void) {
-	motor_set_step(STEP_FULL);
+	motor_set_step(STEP_SIXTEENTH);
 	PORTC &= ~_BV(MOTOR_ENABLE);
 	PORTB |= _BV(MOTOR_SLEEP);
 	PORTB &= ~_BV(MOTOR_STEP);
