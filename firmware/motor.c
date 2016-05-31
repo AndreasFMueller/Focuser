@@ -44,7 +44,8 @@ unsigned char	motor_get_step() {
 static volatile unsigned short	current;
 static volatile unsigned short	target;
 static unsigned char	speed = SPEED_SLOW;
-static unsigned char	slow;
+static unsigned char	divisor;
+static unsigned char	microstep;
 
 /**
  * \brief Get the current motor position
@@ -71,12 +72,7 @@ unsigned short	motor_target() {
 	return target;
 }
 
-#define	DIVISOR_FAST	2
-#if 0
-#define DIVISOR_SLOW	16
-#else
-#define DIVISOR_SLOW	2
-#endif
+#define	DIVISOR	2
 
 /**
  * \brief save the current value
@@ -110,25 +106,45 @@ void	motor_handler() {
 	}
 	timelastchanged = 0;
 	// set the direction
-	if (0 == --slow) {
-		if (target > current) {
-			PORTB |= _BV(MOTOR_DIR);
-			current++;
+	if (0 == --divisor) {
+		if (speed == SPEED_SLOW) {
+			if (target > current) {
+				microstep = (microstep + 1) % 16;
+				if (0 == microstep) {
+					PORTB |= _BV(MOTOR_DIR);
+					current++;
+				}
+			} else {
+				microstep = (microstep + 15) % 16;
+				if (0 == microstep) {
+					PORTB &= ~_BV(MOTOR_DIR);
+					current--;
+				}
+			}
 		} else {
-			PORTB &= ~_BV(MOTOR_DIR);
-			current--;
+			if (target > current) {
+				PORTB |= _BV(MOTOR_DIR);
+				current++;
+			} else {
+				PORTB &= ~_BV(MOTOR_DIR);
+				current--;
+			}
 		}
 		// send a pulse
 		PORTB |= _BV(MOTOR_STEP);
 		PORTB &= ~_BV(MOTOR_STEP);
 		// set the speed divisor to the appropriate value
-		slow = (speed == SPEED_FAST) ? DIVISOR_FAST : DIVISOR_SLOW;
+		divisor = DIVISOR;
 	}
 }
 
 void	motor_moveto(unsigned short position, unsigned char _speed) {
 	GlobalInterruptDisable();
 	target = position;
+	// if switching to slow speed, reset microstep counter
+	if ((speed != _speed) && (_speed == SPEED_SLOW)) {
+		microstep = 0;
+	}
 	speed = _speed;
 	switch (speed) {
 	case SPEED_FAST:
@@ -176,4 +192,5 @@ void	motor_setup(void) {
 	lastsaved = current;
 	// set the target also to the current, so we don't move anything
 	target = current;
+	microstep = 0;
 }
