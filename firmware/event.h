@@ -22,6 +22,7 @@
 #define FOCUSER_STOP	5
 #define FOCUSER_SAVED	6
 #define FOCUSER_SERIAL	7
+#define FOCUSER_POSITION	8
 
 /**
  * \brief Event handle for control requests

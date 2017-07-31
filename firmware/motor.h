@@ -6,6 +6,8 @@
 #ifndef _motor_h
 #define _motor_h
 
+#include <stdint.h>
+
 #define	SPEED_SLOW	0
 #define SPEED_FAST	1
 
@@ -18,13 +20,14 @@
 extern void	motor_set_step(unsigned char step);
 extern unsigned char	motor_get_stepping();
 
-extern void	motor_moveto(unsigned short position, unsigned char speed);
-extern unsigned short	motor_current();
+extern void	motor_moveto(uint32_t position, unsigned char speed);
+extern void	motor_position(uint32_t position);
+extern uint32_t	motor_current();
 extern void	motor_stop();
-extern unsigned short	motor_target();
-extern unsigned short	motor_speed();
+extern uint32_t	motor_target();
+extern uint32_t	motor_speed();
 
-extern volatile unsigned short	lastsaved;
+extern volatile uint32_t	lastsaved;
 extern volatile unsigned char	saveneeded;
 
 extern void	motor_save();

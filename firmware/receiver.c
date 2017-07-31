@@ -100,10 +100,10 @@ void	recv_handler() {
 	}
 	switch (direction) {
 	case RECV_A:
-		motor_moveto(0xffff, speed);
+		motor_moveto(0xffffff, speed);
 		break;
 	case RECV_B:
-		motor_moveto(1, speed);
+		motor_moveto(0x000001, speed);
 		break;
 	default:
 		motor_stop();

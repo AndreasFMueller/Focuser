@@ -65,6 +65,7 @@ char	*libusb_strerror(int rc) {
 #define FOCUSER_STOP	5
 #define FOCUSER_SAVED	6
 #define FOCUSER_SERIAL	7
+#define FOCUSER_POSITION	8
 
 /*
  * display the descriptors, for tesing
@@ -146,12 +147,14 @@ void	usage(const char *progname) {
 	printf("  %s [ options ] set <value>\n", progname);
 	printf("  %s [ options ] up\n", progname);
 	printf("  %s [ options ] down\n", progname);
-	printf("  %s [ options ] stop\n\n", progname);
+	printf("  %s [ options ] stop\n", progname);
+	printf("  %s [ options ] position <value>\n\n", progname);
 	printf("To move the focuser to a new position, use the set command. Fast moves can\n");
 	printf("be done using the -f option. Stop movement with the stop command, and stay\n");
 	printf("informed about the current position of the moving focuser using the get\n");
 	printf("command. The up and down commands are equivalent to setting the extreme\n");
-	printf("values of the focuser.\n\n");
+	printf("values of the focuser. The position command sets the internal focuser\n");
+	printf("position without moving the motor.\n\n");
 	printf("  %s [ options ] receiver\n", progname);
 	printf("  %s [ options ] [ lock | unlock ]\n\n", progname),
 	printf("Get information about the receiver buttons, lock or unlock the them\n\n");
@@ -256,13 +259,14 @@ int	main(int argc, char *argv[]) {
 
 	// the command interpreter for commands using the same USB commands
 	// usually starts off with the command set to an invalid command,
-	// and aonly does something, if the command is set
+	// and only does something, if the command is set
 	uint8_t		cmd = 0xff;
 
 	// all commands need value and index, so we allocate these variables
 	// only once
 	uint16_t	value = 0;
 	uint16_t	index = 0;
+	int32_t		position = 0;
 
 	// set command implementation
 	index = (fast) ? 1 : 0;
@@ -271,24 +275,26 @@ int	main(int argc, char *argv[]) {
 			fprintf(stderr, "no argument to set given\n");
 			return EXIT_SUCCESS;
 		}
-		value = atoi(argv[optind++]);
+		position = atoi(argv[optind++]);
 		cmd = FOCUSER_SET;
 	}
 	if (0 == strcmp(command, "up")) {
-		value = 0xfffe;
+		position = 0xfffffe;
 		cmd = FOCUSER_SET;
 	}
 	if (0 == strcmp(command, "down")) {
-		value = 0x1;
+		position = 0x000001;
 		cmd = FOCUSER_SET;
 	}
 	if (cmd == FOCUSER_SET) {
+		fprintf(stderr, "target position: %d\n", position);
 		rc = libusb_control_transfer(handle,
 			LIBUSB_REQUEST_TYPE_VENDOR |
 			LIBUSB_RECIPIENT_DEVICE |
 			LIBUSB_ENDPOINT_OUT, cmd, 
-			value, index, NULL, 0, 1000);
-		if (rc) {
+			value, index, (unsigned char *)&position,
+			sizeof(position), 1000);
+		if (rc < 0) {
 			fprintf(stderr, "cannot send SET: %s\n", 
 				libusb_strerror(rc));
 			return EXIT_FAILURE;
@@ -299,26 +305,26 @@ int	main(int argc, char *argv[]) {
 	// set command implementation
 	if (0 == strcmp(command, "get")) {
 		index = 0xf;
-		unsigned short	result[3];
+		int32_t	result[3];
 		rc = libusb_control_transfer(handle,
 			LIBUSB_REQUEST_TYPE_VENDOR |
 			LIBUSB_RECIPIENT_DEVICE |
 			LIBUSB_ENDPOINT_IN, FOCUSER_GET, 
-			0, index, (unsigned char *)result, 6, 1000);
+			0, index, (unsigned char *)result, sizeof(result), 1000);
 		if (rc < 0) {
 			fprintf(stderr, "cannot send GET: %s\n", 
 				libusb_strerror(rc));
 			return EXIT_FAILURE;
 		}
-		if (rc != 6) {
+		if (rc != sizeof(result)) {
 			fprintf(stderr, "focuser position not received\n");
 			return EXIT_FAILURE;
 		}
 		if (result[0] == result[1]) {
-			printf("current: %hu, target: %hu\n",
+			printf("current: %d, target: %d\n",
 				result[0], result[1]);
 		} else {
-			printf("current: %hu, target: %hu, speed: %s\n",
+			printf("current: %d, target: %d, speed: %s\n",
 				result[0], result[1],
 				(result[2]) ? "fast" : "slow");
 		}
@@ -327,22 +333,22 @@ int	main(int argc, char *argv[]) {
 
 	// set command implementation
 	if (0 == strcmp(command, "saved")) {
-		unsigned short	result;
+		int32_t	result;
 		rc = libusb_control_transfer(handle,
 			LIBUSB_REQUEST_TYPE_VENDOR |
 			LIBUSB_RECIPIENT_DEVICE |
 			LIBUSB_ENDPOINT_IN, FOCUSER_SAVED, 
-			0, 0, (unsigned char *)&result, 2, 1000);
+			0, 0, (unsigned char *)&result, sizeof(result), 1000);
 		if (rc < 0) {
 			fprintf(stderr, "cannot send GET: %s\n", 
 				libusb_strerror(rc));
 			return EXIT_FAILURE;
 		}
-		if (rc != 2) {
+		if (rc != sizeof(result)) {
 			fprintf(stderr, "focuser position not received\n");
 			return EXIT_FAILURE;
 		}
-		printf("saved: %hu\n", result);
+		printf("saved: %d\n", result);
 		return EXIT_SUCCESS;
 	}
 
@@ -414,6 +420,10 @@ int	main(int argc, char *argv[]) {
 
 	// serial command
 	if (0 == strcmp(command, "serial")) {
+		if (optind >= argc) {
+			fprintf(stderr, "serial number string missing\n");
+			return EXIT_FAILURE;
+		}
 		char	*newserial = argv[optind];
 		int	l = strlen(newserial);
 		if (l > 7) {
@@ -447,6 +457,32 @@ int	main(int argc, char *argv[]) {
 		if (rc) {
 			fprintf(stderr, "cannot send RESET: %s (%d)\n", 
 				libusb_strerror(rc), rc);
+			return EXIT_FAILURE;
+		}
+		return EXIT_SUCCESS;
+	}
+
+	// position command
+	if (0 == strcmp(command, "position")) {
+		if (optind >= argc) {
+			fprintf(stderr, "position argument missing\n");
+			return EXIT_FAILURE;
+		}
+		uint32_t	position = atoi(argv[optind]);
+		rc = libusb_control_transfer(handle,
+			LIBUSB_REQUEST_TYPE_VENDOR |
+			LIBUSB_RECIPIENT_DEVICE |
+			LIBUSB_ENDPOINT_OUT, FOCUSER_POSITION, 
+			value, index, (unsigned char *)&position,
+			sizeof(position), 1000);
+		if (rc < 0) {
+			fprintf(stderr, "cannot send POSITION: %s\n", 
+				libusb_strerror(rc));
+			return EXIT_FAILURE;
+		}
+		if (rc != sizeof(position)) {
+			fprintf(stderr, "could not send position %u\n",
+				position);
 			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;

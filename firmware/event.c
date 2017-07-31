@@ -40,13 +40,19 @@ void	process_reset() {
  * in high speed mode, otherwise in slow speed.
  */
 void	process_set() {
+	uint32_t	position = 0;
 	Endpoint_ClearSETUP();
-	Endpoint_ClearStatusStage();
-	if ((USB_ControlRequest.wValue == 0)
-		|| (USB_ControlRequest.wValue == 0xffff)) {
+	Endpoint_Read_Control_Stream_LE((void *)&position, sizeof(position));
+	Endpoint_ClearIN();
+	// ignore set commands that go beyond the accpetable range
+	if (position > 0xffffff) {
 		return;
 	}
-	motor_moveto(USB_ControlRequest.wValue,
+	// treat end points of range differently
+	if ((position == 0) || (position == 0xffffff)) {
+		return;
+	}
+	motor_moveto(position,
 		(USB_ControlRequest.wIndex) ? SPEED_FAST : SPEED_SLOW);
 }
 
@@ -93,6 +99,24 @@ void	process_serial() {
 	newserial = 1;
 }
 
+/**
+ * \brief POSITION request
+ *
+ * sets the position to a specific value
+ */
+void	process_position() {
+	Endpoint_ClearSETUP();
+	uint32_t	zeroposition = 0x800000;
+	Endpoint_Read_Control_Stream_LE((void *)&zeroposition,
+		sizeof(zeroposition));
+	Endpoint_ClearIN();
+	if (zeroposition > 0xfffffe) {
+		return;
+	}
+	motor_position(zeroposition);
+	motor_save();
+}
+
 #define	is_control() \
 	((USB_ControlRequest.bmRequestType & CONTROL_REQTYPE_TYPE) 	\
 		== REQTYPE_VENDOR) 					\
@@ -116,11 +140,11 @@ void	process_serial() {
  */
 void	process_get() {
 	Endpoint_ClearSETUP();
-	unsigned short	v[3];
+	int32_t	v[3];
 	v[0] = motor_current();
 	v[1] = motor_target();
 	v[2] = motor_speed();
-	Endpoint_Write_Control_Stream_LE((void *)v, 6);
+	Endpoint_Write_Control_Stream_LE((void *)v, sizeof(v));
 	Endpoint_ClearOUT();
 }
 
@@ -141,8 +165,8 @@ void	process_rcvr() {
  */
 void	process_saved() {
 	Endpoint_ClearSETUP();
-	unsigned short	v = lastsaved;
-	Endpoint_Write_Control_Stream_LE((void *)&v, 2);
+	uint32_t	v = lastsaved;
+	Endpoint_Write_Control_Stream_LE((void *)&v, sizeof(v));
 	Endpoint_ClearOUT();
 }
 
@@ -169,6 +193,9 @@ void	EVENT_USB_Device_ControlRequest() {
 				break;
 			case FOCUSER_SERIAL:
 				process_serial();
+				break;
+			case FOCUSER_POSITION:
+				process_position();
 				break;
 			}
 		}

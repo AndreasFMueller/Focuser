@@ -21,7 +21,7 @@
 
 #define	MS_MASK		(_BV(PORTC4)|_BV(PORTC5)|_BV(PORTC6))
 
-uint16_t	EEMEM	position = 0x8000;
+uint32_t	EEMEM	position = 0x800000;
 
 volatile unsigned char	saveneeded = 0;
 
@@ -41,8 +41,8 @@ unsigned char	motor_get_step() {
 	return (PORTC & MS_MASK) >> 4;
 }
 
-static volatile unsigned short	current;
-static volatile unsigned short	target;
+static volatile uint32_t	current;
+static volatile uint32_t	target;
 static unsigned char	speed = SPEED_SLOW;
 static unsigned char	divisor;
 static unsigned char	microstep;
@@ -50,15 +50,15 @@ static unsigned char	microstep;
 /**
  * \brief Get the current motor position
  */
-unsigned short	motor_current() {
+uint32_t	motor_current() {
 	return current;
 }
 
-unsigned short	motor_speed() {
+uint32_t	motor_speed() {
 	return speed;
 }
 
-volatile unsigned short	lastsaved;
+volatile uint32_t	lastsaved;
 static volatile uint32_t	timelastchanged = 0;
 
 /**
@@ -68,7 +68,7 @@ static volatile uint32_t	timelastchanged = 0;
  * the motor is moving by checking whether the target and the current
  * position are different.
  */
-unsigned short	motor_target() {
+uint32_t	motor_target() {
 	return target;
 }
 
@@ -79,7 +79,7 @@ unsigned short	motor_target() {
  */
 void	motor_save() {
 	GlobalInterruptDisable();
-	eeprom_write_word(&position, lastsaved);
+	eeprom_write_dword(&position, lastsaved);
 	saveneeded = 0;
 	GlobalInterruptEnable();
 }
@@ -138,7 +138,7 @@ void	motor_handler() {
 	}
 }
 
-void	motor_moveto(unsigned short position, unsigned char _speed) {
+void	motor_moveto(uint32_t position, unsigned char _speed) {
 	GlobalInterruptDisable();
 	target = position;
 	// if switching to slow speed, reset microstep counter
@@ -154,6 +154,13 @@ void	motor_moveto(unsigned short position, unsigned char _speed) {
 		motor_set_step(STEP_SIXTEENTH);
 		break;
 	}
+	GlobalInterruptEnable();
+}
+
+void	motor_position(uint32_t position) {
+	GlobalInterruptDisable();
+	target = position;
+	current = position;
 	GlobalInterruptEnable();
 }
 
@@ -188,7 +195,7 @@ void	motor_setup(void) {
 	DDRC |= 0x74;
 	DDRB |= 0xf0;
 	// read the current value from the EEPROM
-	current = eeprom_read_word(&position);
+	current = eeprom_read_dword(&position);
 	lastsaved = current;
 	// set the target also to the current, so we don't move anything
 	target = current;

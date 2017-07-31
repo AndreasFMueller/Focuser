@@ -59,7 +59,7 @@ const USB_Descriptor_String_t PROGMEM LanguageString
 const USB_Descriptor_String_t PROGMEM ManufacturerString
 	= USB_STRING_DESCRIPTOR(L"Andreas Mueller");
 const USB_Descriptor_String_t PROGMEM ProductString
-	= USB_STRING_DESCRIPTOR(L"Focuser " VERSION " 20160602");
+	= USB_STRING_DESCRIPTOR(L"Focuser " VERSION " 20170731");
 
 // CONFIGURATION: serial number
 const USB_Descriptor_String_t EEMEM SerialNumberString
