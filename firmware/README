@@ -1,3 +1,8 @@
 README for the focuser firmware project
 ---------------------------------------
 
+Since the firmware reads the serial number from eeprom, it is necessary
+to write the eeprom after flashing the device. The "make flash" command
+is supposed to do that. But the serial number will then be 0000000. Use
+the "serial" command of the fclient programm to set the serial number.
+
