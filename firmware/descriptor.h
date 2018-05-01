@@ -8,6 +8,7 @@
 
 #include <avr/pgmspace.h>
 #include <LUFA/Drivers/USB/USB.h>
+#include <eeprom.h>
 
 typedef struct {
 	USB_Descriptor_Configuration_Header_t Config;
@@ -19,7 +20,5 @@ enum StringDescriptors_t {
 	STRING_ID_Product      = 2,
 	STRING_ID_SerialNumber = 3,
 };
-
-extern const USB_Descriptor_String_t EEMEM SerialNumberString;
 
 #endif /* _descriptor_h */

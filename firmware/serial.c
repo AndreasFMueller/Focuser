@@ -5,6 +5,7 @@
  */
 #include <serial.h>
 #include <descriptor.h>
+#include <eeprom.h>
 
 volatile unsigned char	newserial = 0;
 char serialbuffer[8] = "0000000";

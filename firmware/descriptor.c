@@ -61,10 +61,6 @@ const USB_Descriptor_String_t PROGMEM ManufacturerString
 const USB_Descriptor_String_t PROGMEM ProductString
 	= USB_STRING_DESCRIPTOR(L"Focuser " VERSION " 20170731");
 
-// CONFIGURATION: serial number
-const USB_Descriptor_String_t EEMEM SerialNumberString
-	= USB_STRING_DESCRIPTOR(L"0000000");
-
 /**
  * \brief Get descriptors
  *

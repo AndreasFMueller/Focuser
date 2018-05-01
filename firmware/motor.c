@@ -9,6 +9,7 @@
 #include <LUFA/Drivers/USB/USB.h>
 #include <avr/eeprom.h>
 #include <led.h>
+#include <eeprom.h>
 
 #define	MOTOR_ENABLE	PORTC2
 #define MOTOR_MS1	PORTC4
@@ -20,8 +21,6 @@
 #define MOTOR_DIR	PORTB4
 
 #define	MS_MASK		(_BV(PORTC4)|_BV(PORTC5)|_BV(PORTC6))
-
-uint32_t	EEMEM	position = 0x800000;
 
 volatile unsigned char	saveneeded = 0;
 

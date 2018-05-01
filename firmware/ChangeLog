@@ -1,6 +1,9 @@
 ChangeLog
 ---------
 
+20180501:
+	* move eeprom stuff into a separate file
+
 20160125:
 	* software project created
 
