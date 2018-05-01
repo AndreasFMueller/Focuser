@@ -10,6 +10,8 @@
 #include <LUFA/Drivers/USB/USB.h>
 #include <eeprom.h>
 
+extern USB_Descriptor_String_t	SerialNumberMemoryString;
+
 typedef struct {
 	USB_Descriptor_Configuration_Header_t Config;
 } USB_Descriptor_Configuration_t;

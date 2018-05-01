@@ -10,6 +10,6 @@
 #include <LUFA/Drivers/USB/USB.h>
 
 extern uint32_t EEMEM	position;
-extern const USB_Descriptor_String_t EEMEM	SerialNumberString;
+extern USB_Descriptor_String_t EEMEM	SerialNumberString;
 
 #endif /* _eeprom_h */

@@ -8,22 +8,23 @@ MCU = @LUFA_MCU@
 ARCH = @LUFA_ARCH@
 F_USB = @LUFA_F_USB@
 F_CPU = @LUFA_F_CPU@
-LUFA_PATH = @LUFA_PATH@/LUFA
+
+AUTOMAKE_OPTIONS = subdir-objects
 
 # Construct LUFA module source variables
 LUFA_SRC_USB_COMMON = \
-	$(LUFA_PATH)/Drivers/USB/Core/AVR8/USBController_AVR8.c		\
-	$(LUFA_PATH)/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.c		\
-	$(LUFA_PATH)/Drivers/USB/Core/ConfigDescriptors.c		\
-	$(LUFA_PATH)/Drivers/USB/Core/Events.c				\
-	$(LUFA_PATH)/Drivers/USB/Core/USBTask.c				\
-	$(LUFA_PATH)/Drivers/USB/Class/Common/HIDParser.c
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/AVR8/USBController_AVR8.c	\
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/AVR8/USBInterrupt_AVR8.c	\
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/ConfigDescriptors.c		\
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/Events.c			\
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/USBTask.c			\
+	@LUFA_PATH@/LUFA/Drivers/USB/Class/Common/HIDParser.c
 
 LUFA_SRC_USB_DEVICE = \
-	$(LUFA_PATH)/Drivers/USB/Core/AVR8/Device_AVR8.c		\
-	$(LUFA_PATH)/Drivers/USB/Core/AVR8/Endpoint_AVR8.c		\
-	$(LUFA_PATH)/Drivers/USB/Core/AVR8/EndpointStream_AVR8.c	\
-	$(LUFA_PATH)/Drivers/USB/Core/DeviceStandardReq.c		\
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/AVR8/Device_AVR8.c		\
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/AVR8/Endpoint_AVR8.c		\
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/AVR8/EndpointStream_AVR8.c	\
+	@LUFA_PATH@/LUFA/Drivers/USB/Core/DeviceStandardReq.c		\
 	$(LUFA_SRC_USB_COMMON)
 
 noinst_PROGRAMS = focuser

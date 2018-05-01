@@ -2,9 +2,19 @@
 # configure the guiderport project
 #
 # (c) 2015 Prof Dr Andreas Mueller, Hochschule Rapperswil
-# $Id$
 #
 CFLAGS="-Wall -g -O2"
 export CFLAGS
-./configure --host=avr \
-	--with-lufa=/Users/afm/Projects/Electronics/lufa-LUFA-140928
+
+if [ -d /Users/afm/Projects/Electronics/lufa-LUFA-140928 ]
+then
+	lufadir=/Users/afm/Projects/Electronics/lufa-LUFA-140928
+fi
+
+if [ -d ../../lufa-LUFA-170418 ]
+then
+	lufadir=../../lufa-LUFA-170418
+fi
+
+./configure --host=avr --with-lufa=${lufadir}
+

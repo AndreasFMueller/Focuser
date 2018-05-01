@@ -10,5 +10,6 @@ extern volatile unsigned char	newserial;
 extern char	serialbuffer[8];
 
 extern void	serial_write();
+extern void	serial_read();
 
 #endif /* _serial_h */

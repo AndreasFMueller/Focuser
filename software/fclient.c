@@ -87,18 +87,30 @@ int	show_descriptors(libusb_device_handle *handle) {
 	printf("idProduct:          0x%04x\n", device_descriptor.idProduct);
 	unsigned char	s[128];
 	if (device_descriptor.iManufacturer) {
-		libusb_get_string_descriptor_ascii(handle,
+		int	rc = libusb_get_string_descriptor_ascii(handle,
 			device_descriptor.iManufacturer, s, sizeof(s));
+		if (rc < 0) {
+			snprintf((char *)s, sizeof(s), "error: %s (%d)",
+				libusb_error_name(rc), rc);
+		}
 		printf("Manufacturer:       %s\n", s);
 	}
 	if (device_descriptor.iProduct) {
-		libusb_get_string_descriptor_ascii(handle,
+		int	rc = libusb_get_string_descriptor_ascii(handle,
 			device_descriptor.iProduct, s, sizeof(s));
+		if (rc < 0) {
+			snprintf((char *)s, sizeof(s), "error: %s (%d)",
+				libusb_error_name(rc), rc);
+		}
 		printf("Product:            %s\n", s);
 	}
 	if (device_descriptor.iSerialNumber) {
-		libusb_get_string_descriptor_ascii(handle,
+		int	rc = libusb_get_string_descriptor_ascii(handle,
 			device_descriptor.iSerialNumber, s, sizeof(s));
+		if (rc < 0) {
+			snprintf((char *)s, sizeof(s), "error: %s (%d)",
+				libusb_error_name(rc), rc);
+		}
 		printf("Serial Number:      %s\n", s);
 	}
 	printf("bNumConfigurations: %d\n", device_descriptor.bNumConfigurations);
@@ -119,9 +131,13 @@ int	show_descriptors(libusb_device_handle *handle) {
 	printf("    bConfigurationValue:  %d\n",
 		config_descriptor->bConfigurationValue);
 	if (config_descriptor->iConfiguration) {
-		libusb_get_string_descriptor_ascii(handle,
-			config_descriptor->iConfiguration, s, sizeof(s));
-		printf("Serial Number:      %s\n", s);
+		int	rc = libusb_get_string_descriptor_ascii(handle,
+				config_descriptor->iConfiguration, s, sizeof(s));
+		if (rc < 0) {
+			snprintf((char *)s, sizeof(s), "error: %s (%d)",
+				libusb_error_name(rc), rc);
+		}
+		printf("iConfiguration:     %s\n", s);
 	}
 	printf("    bmAttributes:         %d\n",
 		config_descriptor->bmAttributes);
@@ -427,7 +443,8 @@ int	main(int argc, char *argv[]) {
 		char	*newserial = argv[optind];
 		int	l = strlen(newserial);
 		if (l > 7) {
-			fprintf(stderr, "serial string too long\n");
+			fprintf(stderr, "serial string '%s' too long (%d > 7)\n",
+				newserial, l);
 			return EXIT_FAILURE;
 		}
 		rc = libusb_control_transfer(handle,

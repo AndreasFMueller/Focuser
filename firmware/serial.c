@@ -34,8 +34,17 @@ void	serial_write() {
 	// write the string to EEPROM
 	eeprom_write_block(descriptor, &SerialNumberString,
 		descriptor->Header.Size);
+
+	// read the serial number
+	serial_read();
 	
 	// remember that the serial number has been written
 	newserial = 0;
 }
 
+void	serial_read() {
+// copy the serial number string into RAM
+	uint16_t Size = eeprom_read_byte(&SerialNumberString.Header.Size);
+	eeprom_read_block(&SerialNumberMemoryString, &SerialNumberString,
+		2 + Size);
+}

@@ -14,6 +14,7 @@
 #include <led.h>
 #include <motor.h>
 #include <serial.h>
+#include <descriptor.h>
 
 /**
  * /brief Main function for the focuser firmware
@@ -29,6 +30,9 @@ int	main(int argc, char *argv[]) {
 		led_on();
 	}
 	led_off();
+
+	// copy the serial number string into RAM
+	serial_read();
 
 	// initialize USB, but USB requests will only be handled when
 	// interrupts are enabled below

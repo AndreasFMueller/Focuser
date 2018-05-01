@@ -61,6 +61,9 @@ const USB_Descriptor_String_t PROGMEM ManufacturerString
 const USB_Descriptor_String_t PROGMEM ProductString
 	= USB_STRING_DESCRIPTOR(L"Focuser " VERSION " 20170731");
 
+USB_Descriptor_String_t	SerialNumberMemoryString
+	= USB_STRING_DESCRIPTOR(L".......");
+
 /**
  * \brief Get descriptors
  *
@@ -70,7 +73,7 @@ const USB_Descriptor_String_t PROGMEM ProductString
  * in what memory address space it can find the descriptor.
  */
 uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
-				    const uint8_t wIndex,
+				    const uint16_t wIndex,
 				    const void** const DescriptorAddress,
 				    uint8_t* MemoryAddressSpace)
 {
@@ -105,9 +108,15 @@ uint16_t CALLBACK_USB_GetDescriptor(const uint16_t wValue,
 			Size    = pgm_read_byte(&ProductString.Header.Size);
 			break;
 		case STRING_ID_SerialNumber:
+#if 0
 			Address = &SerialNumberString;
 			Size    = eeprom_read_byte(&SerialNumberString.Header.Size);
 			*MemoryAddressSpace = MEMSPACE_EEPROM;
+#else
+			Address = &SerialNumberMemoryString;
+			Size = SerialNumberString.Header.Size;
+			*MemoryAddressSpace = MEMSPACE_RAM;
+#endif
 			break;
 		}
 
