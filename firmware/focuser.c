@@ -46,6 +46,7 @@ int	main(int argc, char *argv[]) {
 
 	// do nothing	
 	for (;;) {
+		USB_USBTask();
 		if (saveneeded) {
 			motor_save();
 		}

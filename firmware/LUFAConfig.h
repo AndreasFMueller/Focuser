@@ -77,9 +77,9 @@
 //		#define DEVICE_STATE_AS_GPIOR            {Insert Value Here}
 //		#define FIXED_NUM_CONFIGURATIONS         {Insert Value Here}
 		#define CONTROL_ONLY_DEVICE
-		#define INTERRUPT_CONTROL_ENDPOINT
+//		#define INTERRUPT_CONTROL_ENDPOINT
 //		#define NO_DEVICE_REMOTE_WAKEUP
-//		#define NO_DEVICE_SELF_POWER
+		#define NO_DEVICE_SELF_POWER
 
 		/* USB Host Mode Driver Related Tokens: */
 //		#define HOST_STATE_AS_GPIOR              {Insert Value Here}
