@@ -17,7 +17,7 @@
 #include <descriptor.h>
 
 /**
- * /brief Main function for the focuser firmware
+ * \brief Main function for the focuser firmware
  */
 int	main(int argc, char *argv[]) {
 	// initialize the 

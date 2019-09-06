@@ -1,6 +1,13 @@
 ChangeLog
 ---------
 
+20190906:
+	* generate serial number from date
+	* generate date in the description string
+	* add new USB commands to control "fast" speed
+	* add settop and gettop commands to the fclient
+	* add additional version information to fclient
+
 20180501:
 	* move eeprom stuff into a separate file
 

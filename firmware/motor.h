@@ -27,6 +27,10 @@ extern void	motor_stop();
 extern uint32_t	motor_target();
 extern uint32_t	motor_speed();
 
+extern void	motor_set_topspeed(uint8_t settopspeed);
+extern uint8_t	motor_get_topspeed();
+extern uint8_t	motor_faststep();
+
 extern volatile uint32_t	lastsaved;
 extern volatile unsigned char	saveneeded;
 

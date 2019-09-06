@@ -66,6 +66,7 @@ char	*libusb_strerror(int rc) {
 #define FOCUSER_SAVED	6
 #define FOCUSER_SERIAL	7
 #define FOCUSER_POSITION	8
+#define FOCUSER_TOPSPEED	9
 
 /*
  * display the descriptors, for tesing
@@ -146,12 +147,7 @@ int	show_descriptors(libusb_device_handle *handle) {
 	return EXIT_SUCCESS;
 }
 
-void	show_version() {
-	const struct libusb_version* version;
-	version = libusb_get_version();
-	printf("libusb version: %d.%d.%d.%d\n",
-		version->major, version->minor, version->micro, version->nano);
-}
+extern void	show_version();
 
 /*
  * Show usage message
@@ -177,6 +173,8 @@ void	usage(const char *progname) {
 	printf("  %s [ options ] reset\n", progname);
 	printf("  %s [ options ] descriptors\n", progname);
 	printf("  %s [ options ] serial <serial>\n", progname);
+	printf("  %s [ options ] gettop\n", progname);
+	printf("  %s [ options ] settop <0-3>\n", progname);
 	printf("  %s [ options ] help\n\n", progname);
 	printf("The reset command reboots the focuser hardware. The descriptors command\n");
 	printf("displays the USB descriptors of the device, shows serial number among others.\n");
@@ -318,7 +316,7 @@ int	main(int argc, char *argv[]) {
 		return EXIT_SUCCESS;
 	}
 
-	// set command implementation
+	// get command implementation
 	if (0 == strcmp(command, "get")) {
 		index = 0xf;
 		int32_t	result[3];
@@ -344,6 +342,27 @@ int	main(int argc, char *argv[]) {
 				result[0], result[1],
 				(result[2]) ? "fast" : "slow");
 		}
+		return EXIT_SUCCESS;
+	}
+
+	// get the configured top speed
+	if (0 == strcmp(command, "gettop")) {
+		unsigned char	result;
+		rc = libusb_control_transfer(handle,
+			LIBUSB_REQUEST_TYPE_VENDOR |
+			LIBUSB_RECIPIENT_DEVICE |
+			LIBUSB_ENDPOINT_IN, FOCUSER_TOPSPEED, 
+			0, 0, (unsigned char *)&result, sizeof(result), 1000);
+		if (rc < 0) {
+			fprintf(stderr, "cannot send TOPSPEED command: %s\n",
+				libusb_strerror(rc));
+			return EXIT_FAILURE;
+		}
+		if (rc != 1) {
+			fprintf(stderr, "focuser top speed not received\n");
+			return EXIT_FAILURE;
+		}
+		printf("top speed: %d\n", (int)result);
 		return EXIT_SUCCESS;
 	}
 
@@ -383,7 +402,7 @@ int	main(int argc, char *argv[]) {
 		return EXIT_SUCCESS;
 	}
 
-	// set command implementation
+	// receiver command implementation
 	if (0 == strcmp(command, "receiver")) {
 		unsigned char	result;
 		rc = libusb_control_transfer(handle,
@@ -500,6 +519,36 @@ int	main(int argc, char *argv[]) {
 		if (rc != sizeof(position)) {
 			fprintf(stderr, "could not send position %u\n",
 				position);
+			return EXIT_FAILURE;
+		}
+		return EXIT_SUCCESS;
+	}
+
+	// set topspeed command
+	if (0 == strcmp(command, "settop")) {
+		if (optind >= argc) {
+			fprintf(stderr, "top speed argument missing\n");
+			return EXIT_FAILURE;
+		}
+		unsigned char	topspeed = atoi(argv[optind]);
+		if (topspeed > 3) {
+			fprintf(stderr, "not a valid top speed value\n");
+			return EXIT_FAILURE;
+		}
+		rc = libusb_control_transfer(handle,
+			LIBUSB_REQUEST_TYPE_VENDOR |
+			LIBUSB_RECIPIENT_DEVICE |
+			LIBUSB_ENDPOINT_OUT, FOCUSER_TOPSPEED, 
+			0, 0, (unsigned char *)&topspeed,
+			sizeof(topspeed), 1000);
+		if (rc < 0) {
+			fprintf(stderr, "cannot send TOPSPEED: %s\n", 
+				libusb_strerror(rc));
+			return EXIT_FAILURE;
+		}
+		if (rc != sizeof(topspeed)) {
+			fprintf(stderr, "could not send position %u\n",
+				(int)topspeed);
 			return EXIT_FAILURE;
 		}
 		return EXIT_SUCCESS;

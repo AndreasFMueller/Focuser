@@ -45,6 +45,7 @@ static volatile uint32_t	target;
 static unsigned char	speed = SPEED_SLOW;
 static unsigned char	divisor;
 static unsigned char	microstep;
+static unsigned char	stepsize;
 
 /**
  * \brief Get the current motor position
@@ -122,11 +123,17 @@ void	motor_handler() {
 			}
 		} else {
 			if (target > current) {
-				PORTB |= _BV(MOTOR_DIR);
-				current++;
+				microstep = (microstep + stepsize) % 16;
+				if (0 == microstep) {
+					PORTB |= _BV(MOTOR_DIR);
+					current++;
+				}
 			} else {
-				PORTB &= ~_BV(MOTOR_DIR);
-				current--;
+				microstep = (microstep + (16 - stepsize)) % 16;
+				if (0 == microstep) {
+					PORTB &= ~_BV(MOTOR_DIR);
+					current--;
+				}
 			}
 		}
 		// send a pulse
@@ -140,14 +147,27 @@ void	motor_handler() {
 void	motor_moveto(uint32_t position, unsigned char _speed) {
 	GlobalInterruptDisable();
 	target = position;
+#if 0
 	// if switching to slow speed, reset microstep counter
 	if ((speed != _speed) && (_speed == SPEED_SLOW)) {
 		microstep = 0;
 	}
+#else
+	// always reset the microstep counter
+	microstep = 0;
+#endif
 	speed = _speed;
 	switch (speed) {
-	case SPEED_FAST:
-		motor_set_step(STEP_FULL);
+	case SPEED_FAST: {
+			unsigned char	s = motor_faststep();
+			motor_set_step(s);
+			switch (s) {
+				case 0:	stepsize = 16; break;
+				case 1:	stepsize =  8; break;
+				case 2:	stepsize =  4; break;
+				case 3:	stepsize =  2; break;
+			}
+		}
 		break;
 	case SPEED_SLOW:
 		motor_set_step(STEP_SIXTEENTH);
@@ -199,4 +219,51 @@ void	motor_setup(void) {
 	// set the target also to the current, so we don't move anything
 	target = current;
 	microstep = 0;
+}
+
+static uint8_t	lasttopspeed = 0xff;
+
+/**
+ * \brief Get the top speed byte (0 for fastest, 4 for slowest)
+ *
+ * \return	the top speed byte
+ */
+uint8_t	motor_get_topspeed() {
+	if (lasttopspeed == 0xff) {
+		lasttopspeed = eeprom_read_byte(&topspeed);
+		if (lasttopspeed > 3) {
+			lasttopspeed = 0;
+			eeprom_write_byte(&topspeed, lasttopspeed);
+		}
+	}
+	return lasttopspeed;
+}
+
+/**
+ * \brief Set the top speed in the EEPROM
+ *
+ * \param settopspeed	the top speed value to remember
+ */
+void	motor_set_topspeed(uint8_t settopspeed) {
+	if (settopspeed > 3) {
+		return;
+	}
+	eeprom_write_byte(&topspeed, settopspeed);
+	lasttopspeed = settopspeed;
+}
+
+/**
+ * \brief Get the step configuration byte from the 
+ *
+ * \return	get the step configuration byte for the stepper driver
+ */
+uint8_t	motor_faststep() {
+	switch (motor_get_topspeed()) {
+	case 0:	return STEP_FULL;
+	case 1:	return STEP_HALF;
+	case 2:	return STEP_QUARTER;
+	case 3: return STEP_EIGHTH;
+	}
+	/* by default, give the fastest speed (for compatibility) 	*/
+	return STEP_FULL;
 }

@@ -11,5 +11,6 @@
 
 extern uint32_t EEMEM	position;
 extern USB_Descriptor_String_t EEMEM	SerialNumberString;
+extern uint8_t	EEMEM	topspeed;	
 
 #endif /* _eeprom_h */

@@ -3,6 +3,7 @@
  *
  * (c) 2016 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
+#include <config.h>
 #include <serial.h>
 #include <descriptor.h>
 #include <eeprom.h>

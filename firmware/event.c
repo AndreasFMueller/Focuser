@@ -117,6 +117,18 @@ void	process_position() {
 	motor_save();
 }
 
+/**
+ * \brief set TOPSPEED request
+ */
+void	process_set_topspeed() {
+	Endpoint_ClearSETUP();
+	uint8_t	settopspeed = 0x00;
+	Endpoint_Read_Control_Stream_LE((void *)&settopspeed,
+		sizeof(settopspeed));
+	Endpoint_ClearIN();
+	motor_set_topspeed(settopspeed);
+}
+
 #define	is_control() \
 	((USB_ControlRequest.bmRequestType & CONTROL_REQTYPE_TYPE) 	\
 		== REQTYPE_VENDOR) 					\
@@ -171,6 +183,16 @@ void	process_saved() {
 }
 
 /**
+ * \brief set TOPSPEED implementation
+ */
+void	process_get_topspeed() {
+	Endpoint_ClearSETUP();
+	unsigned char	v = motor_get_topspeed();
+	Endpoint_Write_Control_Stream_LE((void *)&v, 1);
+	Endpoint_ClearOUT();
+}
+
+/**
  * \brief Control request event handler
  *
  * This implementation handles the control requests for the GuiderPort device
@@ -197,6 +219,9 @@ void	EVENT_USB_Device_ControlRequest() {
 			case FOCUSER_POSITION:
 				process_position();
 				break;
+			case FOCUSER_TOPSPEED:
+				process_set_topspeed();
+				break;
 			}
 		}
 		if (is_outgoing()) {
@@ -209,6 +234,9 @@ void	EVENT_USB_Device_ControlRequest() {
 				break;
 			case FOCUSER_SAVED:
 				process_saved();
+				break;
+			case FOCUSER_TOPSPEED:
+				process_get_topspeed();
 				break;
 			}
 		}

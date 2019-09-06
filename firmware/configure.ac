@@ -5,8 +5,8 @@
 # $Id$
 #
 AC_PREREQ(2.57)
-AC_REVISION([1.2])
-AC_INIT([focuser], [1.2])
+AC_REVISION([1.3])
+AC_INIT([focuser], [1.3])
 AC_CONFIG_SRCDIR([focuser.c])
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADERS(config.h)
@@ -49,6 +49,18 @@ AC_SUBST(LUFA_F_CPU)
 CPPFLAGS="${CPPFLAGS} -std=gnu99 -I${LUFA_PATH} -DUSE_LUFA_CONFIG_HEADER -DARCH=ARCH_${LUFA_ARCH} -DF_USB=${LUFA_F_USB}UL -DF_CPU=${LUFA_F_CPU}UL"
 
 CFLAGS="${CFLAGS} -std=gnu99 -mmcu=${LUFA_MCU} -fshort-enums -fno-inline-small-functions -fpack-struct -fno-strict-aliasing -funsigned-char -funsigned-bitfields -ffunction-sections"
+
+serial=`date +%y%m%d`
+AC_ARG_WITH(serial,
+[AS_HELP_STRING([--with-serial], [serial number])],
+[
+	serial=${with_serial}
+],[
+])
+AC_DEFINE_UNQUOTED(FOCUSER_SERIAL,[L"${serial}"],[serial number of the focuser device])
+
+builddate=`date +%Y%m%d`
+AC_DEFINE_UNQUOTED(BUILDDATE,[" ${builddate}"],[build date of the focuser firmware])
 
 # the -u flag is needed to ensure that the EVENT handler is linked. There
 # already is a weak symbol of the same name, and the linker apparently sees
